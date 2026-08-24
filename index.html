@@ -105,7 +105,7 @@
       renderCart(); 
     }
 
-    async function submitOrder() {
+   async function submitOrder() {
       if (cart.length === 0) return alert('商品を選択してください。');
 
       const isDiscounted = document.getElementById('discount-checkbox').checked;
@@ -134,22 +134,17 @@
       };
 
       try {
-        const response = await fetch(GOOGLE_API_URL, { 
+        await fetch(GOOGLE_API_URL, { 
           method: 'POST', 
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
+          mode: 'no-cors', 
+          headers: { 'Content-Type': 'application/json' }, 
           body: JSON.stringify(newOrder) 
         });
         
-        const result = await response.json();
-        
-        if (result.status === "success") {
-          alert(`注文が完了しました！\n整理番号: ${result.num}`); 
-        } else {
-          alert(`注文を受け付けました！`);
-        }
+        alert(`注文を正常に受け付けました！`); 
       } catch (err) {
         console.error('送信エラー:', err);
-        alert(`注文を送信しました`);
+        alert(`送信エラーが発生しました。`);
       }
 
       clearCart();
