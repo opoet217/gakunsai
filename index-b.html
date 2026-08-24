@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ご注文画面 (端末B)</title>
+  <title>ご注文画面 (端末A)</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="style.css">
 </head>
@@ -69,7 +69,7 @@
 
   <script>
     const DEVICE_ID = "B";
-    const GOOGLE_API_URL = "https://script.google.com/macros/s/AKfycbymx0h8nGaF4vgOb35kTQvCBFhjcmXG6gFbPGcNjIC8txVs3Rhe5K1IulB7OJOToo6NrQ/exec";
+    const GOOGLE_API_URL = "https://script.google.com/macros/s/AKfycbyJtPBKrmZk7sZwIg2hD7jKmZGn9w2FEAyr_SLBd5IaU46-r436Bpk9TeSUa9l4FIHDJQ/exec";
 
     let cart = []; 
     let total = 0;
@@ -137,7 +137,7 @@
         await fetch(GOOGLE_API_URL, { 
           method: 'POST', 
           mode: 'no-cors', 
-          headers: { 'Content-Type': 'application/json' }, 
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
           body: JSON.stringify(newOrder) 
         });
         
