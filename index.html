@@ -105,7 +105,7 @@
       renderCart(); 
     }
 
-   async function submitOrder() {
+    async function submitOrder() {
       if (cart.length === 0) return alert('商品を選択してください。');
 
       const isDiscounted = document.getElementById('discount-checkbox').checked;
