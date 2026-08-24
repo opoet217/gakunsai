@@ -118,8 +118,8 @@
       let currentSeq = parseInt(localStorage.getItem(counterKey) || "0") + 1;
       if (currentSeq > 999) currentSeq = 1; 
       localStorage.setItem(counterKey, currentSeq);
-
-      const orderNumStr = `#${DEVICE_ID}-${currentSeq}`;
+      const paddedSeq = String(currentSeq).padStart(3, '0');
+      const orderNumStr = `#${DEVICE_ID}-${paddedSeq}`;
 
       let confirmMsg = `注文 ${orderNumStr}（合計 ${total}円`;
       if (isDiscounted) confirmMsg += ` 【割引適用】`;
