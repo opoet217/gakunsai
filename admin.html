@@ -20,27 +20,23 @@
       </button>
     </div>
 
-    <!-- 1. 营业额与销量统计面板 -->
-    <div class="bg-white p-5 rounded-2xl shadow border grid grid-cols-2 md:grid-cols-4 gap-4">
-      <div class="bg-indigo-50 p-3 rounded-xl border border-indigo-100">
-        <p class="text-xs text-indigo-600 font-bold">💰 総売上金額</p>
-        <p class="text-2xl font-black text-indigo-900 mt-1"><span id="stat-total">0</span> <span class="text-sm">円</span></p>
-      </div>
+    <!-- 单品销量统计面板 -->
+    <div class="bg-white p-5 rounded-2xl shadow border grid grid-cols-3 gap-4">
       <div class="bg-amber-50 p-3 rounded-xl border border-amber-100">
-        <p class="text-xs text-amber-700 font-bold">🍜 焼きそば</p>
+        <p class="text-xs text-amber-700 font-bold">🍜 焼きそば 販売数</p>
         <p class="text-2xl font-black text-amber-900 mt-1"><span id="stat-yakisoba">0</span> <span class="text-sm">食</span></p>
       </div>
       <div class="bg-rose-50 p-3 rounded-xl border border-rose-100">
-        <p class="text-xs text-rose-700 font-bold">🌭 フランクフルト</p>
+        <p class="text-xs text-rose-700 font-bold">🌭 フランク 販売数</p>
         <p class="text-2xl font-black text-rose-900 mt-1"><span id="stat-frank">0</span> <span class="text-sm">本</span></p>
       </div>
       <div class="bg-orange-50 p-3 rounded-xl border border-orange-100">
-        <p class="text-xs text-orange-700 font-bold">🥖 チュロス</p>
+        <p class="text-xs text-orange-700 font-bold">🥖 チュロス 販売数</p>
         <p class="text-2xl font-black text-orange-900 mt-1"><span id="stat-churros">0</span> <span class="text-sm">個</span></p>
       </div>
     </div>
 
-    <!-- 3. 在库管理与预警设置 -->
+    <!-- 在库管理与预警设置 -->
     <div class="bg-white p-5 rounded-2xl shadow border">
       <h2 class="text-base font-bold text-gray-700 mb-3 flex items-center justify-between">
         <span>📦 リアルタイム在庫状況</span>
@@ -82,12 +78,31 @@
       <div class="text-center text-gray-400 py-10 font-bold text-lg">データを読み込み中...</div>
     </div>
 
+    <!-- 顶/底部分页控制按钮 -->
+    <div id="pagination-controls" class="flex justify-between items-center bg-white p-4 rounded-2xl shadow border hidden">
+      <button id="prev-btn" onclick="changePage(-1)" class="bg-gray-200 hover:bg-gray-300 disabled:opacity-40 disabled:cursor-not-allowed active:scale-95 text-gray-800 font-bold px-5 py-2.5 rounded-xl transition">
+        ⬅️ 前のページ
+      </button>
+      <span class="text-sm font-bold text-gray-600">
+        ページ <span id="current-page-text" class="text-indigo-600 font-black text-base">1</span> / <span id="total-pages-text">1</span>
+      </span>
+      <button id="next-btn" onclick="changePage(1)" class="bg-gray-200 hover:bg-gray-300 disabled:opacity-40 disabled:cursor-not-allowed active:scale-95 text-gray-800 font-bold px-5 py-2.5 rounded-xl transition">
+        次のページ ➡️
+      </button>
+    </div>
+
   </div>
 
   <script>
     const GOOGLE_API_URL = "https://script.google.com/macros/s/AKfycbwRx0me0hiXD56P6N_yc0eiZ5C0EQqfdxho6E-1ZM9dZb407HtG2-SgXlPnhZU16I_9GQ/exec";
+    
     let previousPendingCount = 0;
     let globalSalesCount = { '焼きそば': 0, 'フランクフルト': 0, 'カップチュロス': 0 };
+    
+    // 分页相关变量
+    let currentPage = 1;
+    const PAGE_SIZE = 10;
+    let cachedOrderArray = [];
 
     function playBeep(freq = 880) {
       try {
@@ -105,17 +120,14 @@
       try {
         const res = await fetch(GOOGLE_API_URL);
         const data = await res.json();
-        renderOrders(data);
+        processOrders(data);
       } catch (err) {
         console.error('取得エラー:', err);
       }
     }
 
-    function renderOrders(rawList) {
-      const container = document.getElementById('order-list');
-      
+    function processOrders(rawList) {
       const groupedOrders = {};
-      let totalSales = 0;
       let salesCount = { '焼きそば': 0, 'フランクフルト': 0, 'カップチュロス': 0 };
 
       rawList.forEach(item => {
@@ -129,17 +141,14 @@
         }
         groupedOrders[item.num].items.push(item);
 
-        // 统计有效的（未取消的）订单数据
         if (item.status !== 'canceled') {
-          totalSales += Number(item.price || 0);
           if (salesCount[item.name] !== undefined) {
             salesCount[item.name] += 1;
           }
         }
       });
 
-      // 更新营业额与销量 UI
-      document.getElementById('stat-total').innerText = totalSales.toLocaleString();
+      // 更新销量 UI
       document.getElementById('stat-yakisoba').innerText = salesCount['焼きそば'];
       document.getElementById('stat-frank').innerText = salesCount['フランクフルト'];
       document.getElementById('stat-churros').innerText = salesCount['カップチュロス'];
@@ -163,19 +172,40 @@
         return numB - numA;
       });
 
+      cachedOrderArray = orderArray;
+
       const pendingOrders = orderArray.filter(o => o.status === 'pending');
       if (pendingOrders.length > previousPendingCount && previousPendingCount !== 0) {
-        playBeep(880); // 新订单提醒音
+        playBeep(880);
       }
       previousPendingCount = pendingOrders.length;
       document.getElementById('pending-count').innerText = pendingOrders.length;
 
-      if (orderArray.length === 0) {
+      // 渲染当前页
+      renderCurrentPage();
+    }
+
+    function renderCurrentPage() {
+      const container = document.getElementById('order-list');
+      const paginationControls = document.getElementById('pagination-controls');
+
+      if (cachedOrderArray.length === 0) {
         container.innerHTML = '<div class="text-center text-gray-400 py-10 font-bold text-lg">現在注文はありません 🎉</div>';
+        paginationControls.classList.add('hidden');
         return;
       }
 
-      container.innerHTML = orderArray.map(o => {
+      // 计算总页数
+      const totalPages = Math.ceil(cachedOrderArray.length / PAGE_SIZE) || 1;
+      if (currentPage > totalPages) currentPage = totalPages;
+      if (currentPage < 1) currentPage = 1;
+
+      // 切片获取当前页的 10 单
+      const startIndex = (currentPage - 1) * PAGE_SIZE;
+      const pageOrders = cachedOrderArray.slice(startIndex, startIndex + PAGE_SIZE);
+
+      // 渲染订单卡片
+      container.innerHTML = pageOrders.map(o => {
         const isDone = o.status === 'done';
         const isCanceled = o.status === 'canceled';
 
@@ -231,6 +261,20 @@
           </div>
         `;
       }).join('');
+
+      // 更新分页控件状态
+      paginationControls.classList.remove('hidden');
+      document.getElementById('current-page-text').innerText = currentPage;
+      document.getElementById('total-pages-text').innerText = totalPages;
+
+      document.getElementById('prev-btn').disabled = (currentPage === 1);
+      document.getElementById('next-btn').disabled = (currentPage === totalPages);
+    }
+
+    function changePage(delta) {
+      currentPage += delta;
+      renderCurrentPage();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     // 实时计算剩余库存 & 低库存红字预警
@@ -251,7 +295,6 @@
 
         leftEl.innerText = leftVal;
 
-        // 低库存预警逻辑 (<= 5 份时触发红字高亮)
         if (leftVal <= 5) {
           cardEl.className = "p-3 rounded-xl border-2 bg-red-50 border-red-400 text-red-700 animate-pulse font-bold";
         } else {
@@ -260,7 +303,6 @@
       });
     }
 
-    // 更新订单状态（支持 done 或 canceled）
     async function updateStatus(orderNum, newStatus) {
       const actionName = newStatus === 'done' ? '完了' : 'キャンセル';
       if (!confirm(`注文 ${orderNum} を「${actionName}」にしますか？`)) return;
@@ -278,7 +320,6 @@
       }
     }
 
-    // 每 10 秒自动轮询刷新一次
     setInterval(fetchOrders, 10000);
     fetchOrders();
   </script>
