@@ -1,0 +1,6 @@
+/* 全局防误触与基础防长按选中 */
+body {
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  user-select: none;
+}
