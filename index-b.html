@@ -11,7 +11,7 @@
   <div class="max-w-lg mx-auto bg-white p-6 rounded-3xl shadow-lg border border-gray-200">
     <div class="flex justify-between items-center mb-6 border-b pb-4">
       <h1 class="text-3xl font-extrabold text-indigo-700">🛒 ご注文画面</h1>
-      <span id="dev-tag" class="bg-indigo-100 text-indigo-800 text-xs font-bold px-2.5 py-1 rounded-full">端末: B</span>
+      <span id="dev-tag" class="bg-indigo-100 text-indigo-800 text-xs font-bold px-2.5 py-1 rounded-full">端末: A</span>
     </div>
     
     <!-- 焼きそば -->
@@ -22,7 +22,7 @@
         <label class="flex items-center space-x-2 bg-white px-3 py-2 rounded-xl border border-amber-300"><input type="checkbox" name="yakisoba" value="ケチャップ" class="w-6 h-6"><span>ケチャップ</span></label>
         <label class="flex items-center space-x-2 bg-white px-3 py-2 rounded-xl border border-amber-300"><input type="checkbox" name="yakisoba" value="マヨネーズ" class="w-6 h-6"><span>マヨネーズ</span></label>
       </div>
-      <button onclick="addToCart('焼きそば', 400, 'yakisoba')" class="mt-4 w-full bg-amber-500 text-white font-bold py-3 rounded-xl text-lg shadow-md transition">カートに追加</button>
+      <button id="btn-yakisoba" onclick="addToCart('焼きそば', 400, 'yakisoba', 'btn-yakisoba')" class="mt-4 w-full bg-amber-500 text-white font-bold py-3 rounded-xl text-lg shadow-md transition">カートに追加</button>
     </div>
 
     <!-- フランクフルト -->
@@ -33,7 +33,7 @@
         <label class="flex items-center space-x-2 bg-white px-3 py-2 rounded-xl border border-rose-300"><input type="checkbox" name="frank" value="ケチャップ" checked class="w-6 h-6"><span>ケチャップ</span></label>
         <label class="flex items-center space-x-2 bg-white px-3 py-2 rounded-xl border border-rose-300"><input type="checkbox" name="frank" value="マヨネーズ" class="w-6 h-6"><span>マヨネーズ</span></label>
       </div>
-      <button onclick="addToCart('フランクフルト', 400, 'frank')" class="mt-4 w-full bg-rose-500 text-white font-bold py-3 rounded-xl text-lg shadow-md transition">カートに追加</button>
+      <button id="btn-frank" onclick="addToCart('フランクフルト', 400, 'frank', 'btn-frank')" class="mt-4 w-full bg-rose-500 text-white font-bold py-3 rounded-xl text-lg shadow-md transition">カートに追加</button>
     </div>
 
     <!-- カップチュロス -->
@@ -44,7 +44,7 @@
         <label class="flex items-center space-x-2 bg-white px-3 py-2 rounded-xl border border-orange-300"><input type="checkbox" name="churros" value="チョコ" class="w-6 h-6"><span>チョコ</span></label>
         <label class="flex items-center space-x-2 bg-white px-3 py-2 rounded-xl border border-orange-300"><input type="checkbox" name="churros" value="ジャム" class="w-6 h-6"><span>ジャム</span></label>
       </div>
-      <button onclick="addToCart('カップチュロス', 300, 'churros')" class="mt-4 w-full bg-orange-500 text-white font-bold py-3 rounded-xl text-lg shadow-md transition">カートに追加</button>
+      <button id="btn-churros" onclick="addToCart('カップチュロス', 300, 'churros', 'btn-churros')" class="mt-4 w-full bg-orange-500 text-white font-bold py-3 rounded-xl text-lg shadow-md transition">カートに追加</button>
     </div>
 
     <!-- 结算区 -->
@@ -73,13 +73,13 @@
   </div>
 
   <script>
-    const DEVICE_ID = "B";
+    const DEVICE_ID = "B"; // 端末B请改为 "B"
     const GOOGLE_API_URL = "https://script.google.com/macros/s/AKfycbymx0h8nGaF4vgOb35kTQvCBFhjcmXG6gFbPGcNjIC8txVs3Rhe5K1IulB7OJOToo6NrQ/exec";
 
     let cart = []; 
     let total = 0;
 
-    function addToCart(name, price, checkboxName) {
+    function addToCart(name, price, checkboxName, btnId) {
       const checkedBoxes = Array.from(document.querySelectorAll(`input[name="${checkboxName}"]:checked`));
       const selectedSauces = checkedBoxes.map(cb => cb.value);
       const sauceText = selectedSauces.length > 0 ? selectedSauces.join('・') : 'ソースなし';
@@ -87,6 +87,17 @@
       cart.push({ name, price, sauce: sauceText }); 
       total += price; 
       renderCart();
+
+      // 动画反馈
+      const btn = document.getElementById(btnId);
+      const originalBg = btn.className;
+      btn.className = "mt-4 w-full bg-green-600 text-white font-bold py-3 rounded-xl text-lg shadow-lg scale-95 transition-all duration-150";
+      btn.innerText = "✨ 追加しました！";
+
+      setTimeout(() => {
+        btn.className = originalBg;
+        btn.innerText = "カートに追加";
+      }, 800);
     }
 
     function clearCart() { 
