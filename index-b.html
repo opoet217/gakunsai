@@ -14,33 +14,33 @@
       <span id="dev-tag" class="bg-indigo-100 text-indigo-800 text-xs font-bold px-2.5 py-1 rounded-full">端末: A</span>
     </div>
     
-    <!-- 焼きそば -->
+    <!-- 焼きそば (已删去默认 checked) -->
     <div class="bg-amber-50 p-5 rounded-2xl mb-5 border-2 border-amber-200 shadow-sm">
       <div class="flex justify-between items-center font-bold text-2xl"><span>焼きそば</span><span class="text-amber-700">400円</span></div>
       <div class="mt-4 text-lg font-medium flex flex-wrap gap-3">
-        <label class="flex items-center space-x-2 bg-white px-3 py-2 rounded-xl border border-amber-300"><input type="checkbox" name="yakisoba" value="ウスター" checked class="w-6 h-6"><span>ウスター</span></label>
+        <label class="flex items-center space-x-2 bg-white px-3 py-2 rounded-xl border border-amber-300"><input type="checkbox" name="yakisoba" value="ウスター" class="w-6 h-6"><span>ウスター</span></label>
         <label class="flex items-center space-x-2 bg-white px-3 py-2 rounded-xl border border-amber-300"><input type="checkbox" name="yakisoba" value="ケチャップ" class="w-6 h-6"><span>ケチャップ</span></label>
         <label class="flex items-center space-x-2 bg-white px-3 py-2 rounded-xl border border-amber-300"><input type="checkbox" name="yakisoba" value="マヨネーズ" class="w-6 h-6"><span>マヨネーズ</span></label>
       </div>
       <button id="btn-yakisoba" onclick="addToCart('焼きそば', 400, 'yakisoba', 'btn-yakisoba')" class="mt-4 w-full bg-amber-500 text-white font-bold py-3 rounded-xl text-lg shadow-md transition">カートに追加</button>
     </div>
 
-    <!-- フランクフルト -->
+    <!-- フランクフルト (已删去默认 checked) -->
     <div class="bg-rose-50 p-5 rounded-2xl mb-5 border-2 border-rose-200 shadow-sm">
       <div class="flex justify-between items-center font-bold text-2xl"><span>フランクフルト</span><span class="text-rose-700">400円</span></div>
       <div class="mt-4 text-lg font-medium flex flex-wrap gap-3">
         <label class="flex items-center space-x-2 bg-white px-3 py-2 rounded-xl border border-rose-300"><input type="checkbox" name="frank" value="ウスター" class="w-6 h-6"><span>ウスター</span></label>
-        <label class="flex items-center space-x-2 bg-white px-3 py-2 rounded-xl border border-rose-300"><input type="checkbox" name="frank" value="ケチャップ" checked class="w-6 h-6"><span>ケチャップ</span></label>
+        <label class="flex items-center space-x-2 bg-white px-3 py-2 rounded-xl border border-rose-300"><input type="checkbox" name="frank" value="ケチャップ" class="w-6 h-6"><span>ケチャップ</span></label>
         <label class="flex items-center space-x-2 bg-white px-3 py-2 rounded-xl border border-rose-300"><input type="checkbox" name="frank" value="マヨネーズ" class="w-6 h-6"><span>マヨネーズ</span></label>
       </div>
       <button id="btn-frank" onclick="addToCart('フランクフルト', 400, 'frank', 'btn-frank')" class="mt-4 w-full bg-rose-500 text-white font-bold py-3 rounded-xl text-lg shadow-md transition">カートに追加</button>
     </div>
 
-    <!-- カップチュロス -->
+    <!-- カップチュロス (已删去默认 checked) -->
     <div class="bg-orange-50 p-5 rounded-2xl mb-5 border-2 border-orange-200 shadow-sm">
       <div class="flex justify-between items-center font-bold text-2xl"><span>カップチュロス</span><span class="text-orange-700">300円</span></div>
       <div class="mt-4 text-lg font-medium flex flex-wrap gap-3">
-        <label class="flex items-center space-x-2 bg-white px-3 py-2 rounded-xl border border-orange-300"><input type="checkbox" name="churros" value="プレーン" checked class="w-6 h-6"><span>プレーン</span></label>
+        <label class="flex items-center space-x-2 bg-white px-3 py-2 rounded-xl border border-orange-300"><input type="checkbox" name="churros" value="プレーン" class="w-6 h-6"><span>プレーン</span></label>
         <label class="flex items-center space-x-2 bg-white px-3 py-2 rounded-xl border border-orange-300"><input type="checkbox" name="churros" value="チョコ" class="w-6 h-6"><span>チョコ</span></label>
         <label class="flex items-center space-x-2 bg-white px-3 py-2 rounded-xl border border-orange-300"><input type="checkbox" name="churros" value="ジャム" class="w-6 h-6"><span>ジャム</span></label>
       </div>
@@ -73,7 +73,7 @@
   </div>
 
   <script>
-    const DEVICE_ID = "B"; // 端末B请改为 "B"
+    const DEVICE_ID = "B";
     const GOOGLE_API_URL = "https://script.google.com/macros/s/AKfycbymx0h8nGaF4vgOb35kTQvCBFhjcmXG6gFbPGcNjIC8txVs3Rhe5K1IulB7OJOToo6NrQ/exec";
 
     let cart = []; 
@@ -88,7 +88,6 @@
       total += price; 
       renderCart();
 
-      // 动画反馈
       const btn = document.getElementById(btnId);
       const originalBg = btn.className;
       btn.className = "mt-4 w-full bg-green-600 text-white font-bold py-3 rounded-xl text-lg shadow-lg scale-95 transition-all duration-150";
@@ -154,16 +153,14 @@
       btn.innerText = "注文確定";
       btn.classList.remove('opacity-50', 'cursor-not-allowed');
     }
-    
-function clearCart() { 
+
+    function clearCart() { 
       cart = []; 
       total = 0; 
-      
-      // 把页面上所有的复选框（包括酱料和折扣标记）全部设为不勾选
+      document.getElementById('discount-checkbox').checked = false;
       document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
         cb.checked = false;
       });
-
       renderCart();
     }
 
@@ -181,8 +178,7 @@ function clearCart() {
       }
       document.getElementById('total-price').innerText = total;
     }
-
-    renderCart();
+    clearCart();
   </script>
 </body>
 </html>
