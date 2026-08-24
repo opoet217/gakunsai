@@ -102,7 +102,6 @@
 
   <script>
     const DEVICE_ID = "B"; // 锁定为端末 B
-    const SLACK_WEBHOOK_URL = "https://hooks.slack.com/services/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";
     const GOOGLE_API_URL = "https://script.google.com/macros/s/AKfycbwRx0me0hiXD56P6N_yc0eiZ5C0EQqfdxho6E-1ZM9dZb407HtG2-SgXlPnhZU16I_9GQ/exec";
 
     document.getElementById('dev-tag').innerText = `端末: ${DEVICE_ID}`;
@@ -171,22 +170,14 @@
         status: 'pending'
       };
 
-      // 仅当端末为 B 时才组装 Slack 消息并发送
-      let requests = [
-        fetch(GOOGLE_API_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(newOrder) })
-      ];
-
-      if (DEVICE_ID === "B") {
-        const itemDetails = newOrder.items.map(i => `• *${i.name}* \`[${i.sauce}]\``).join('\n');
-        const slackPayload = { text: `🔔 *【注文 ${orderNumStr} (端末B)】* (${timeStr})\n${itemDetails}\n💰 *合計: ${newOrder.total}円*` };
-        
-        requests.push(
-          fetch(SLACK_WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(slackPayload) })
-        );
-      }
-
+      // 前端只需要把订单数据发送给 Google 后端，由 Google 负责写表格并代发 Slack
       try {
-        await Promise.all(requests);
+        await fetch(GOOGLE_API_URL, { 
+          method: 'POST', 
+          mode: 'no-cors', 
+          headers: { 'Content-Type': 'application/json' }, 
+          body: JSON.stringify(newOrder) 
+        });
       } catch (err) {
         console.error('送信エラー:', err);
       }
