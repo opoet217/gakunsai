@@ -3,36 +3,98 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>厨房・注文管理モニター</title>
+  <title>厨房・注文管理＆在庫モニター</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 p-4 min-h-screen text-gray-800">
-  <div class="max-w-2xl mx-auto">
-    <div class="flex justify-between items-center mb-6 bg-white p-4 rounded-2xl shadow border">
+  <div class="max-w-3xl mx-auto space-y-5">
+    
+    <!-- 顶部标题与更新按钮 -->
+    <div class="flex justify-between items-center bg-white p-4 rounded-2xl shadow border">
       <div>
-        <h1 class="text-2xl font-extrabold text-indigo-700">👨‍🍳 注文進行状況モニター</h1>
+        <h1 class="text-2xl font-extrabold text-indigo-700">👨‍🍳 注文管理＆在庫モニター</h1>
         <p class="text-xs text-gray-500 mt-1">未完了の注文：<span id="pending-count" class="font-bold text-red-500 text-lg">0</span> 件</p>
       </div>
       <button onclick="fetchOrders()" class="bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white font-bold px-4 py-2 rounded-xl shadow transition">
-        🔄 更新
+        🔄 手動更新
       </button>
     </div>
 
+    <!-- 1. 营业额与销量统计面板 -->
+    <div class="bg-white p-5 rounded-2xl shadow border grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div class="bg-indigo-50 p-3 rounded-xl border border-indigo-100">
+        <p class="text-xs text-indigo-600 font-bold">💰 総売上金額</p>
+        <p class="text-2xl font-black text-indigo-900 mt-1"><span id="stat-total">0</span> <span class="text-sm">円</span></p>
+      </div>
+      <div class="bg-amber-50 p-3 rounded-xl border border-amber-100">
+        <p class="text-xs text-amber-700 font-bold">🍜 焼きそば</p>
+        <p class="text-2xl font-black text-amber-900 mt-1"><span id="stat-yakisoba">0</span> <span class="text-sm">食</span></p>
+      </div>
+      <div class="bg-rose-50 p-3 rounded-xl border border-rose-100">
+        <p class="text-xs text-rose-700 font-bold">🌭 フランクフルト</p>
+        <p class="text-2xl font-black text-rose-900 mt-1"><span id="stat-frank">0</span> <span class="text-sm">本</span></p>
+      </div>
+      <div class="bg-orange-50 p-3 rounded-xl border border-orange-100">
+        <p class="text-xs text-orange-700 font-bold">🥖 チュロス</p>
+        <p class="text-2xl font-black text-orange-900 mt-1"><span id="stat-churros">0</span> <span class="text-sm">個</span></p>
+      </div>
+    </div>
+
+    <!-- 3. 在库管理与预警设置 -->
+    <div class="bg-white p-5 rounded-2xl shadow border">
+      <h2 class="text-base font-bold text-gray-700 mb-3 flex items-center justify-between">
+        <span>📦 リアルタイム在庫状況</span>
+        <span class="text-xs font-normal text-gray-400">※残り5個以下で警告アラート</span>
+      </h2>
+      <div class="grid grid-cols-3 gap-3">
+        <!-- 炒面 -->
+        <div id="stock-card-yakisoba" class="p-3 rounded-xl border bg-gray-50 transition">
+          <div class="text-xs font-bold text-gray-500">焼きそば 残り</div>
+          <div class="text-2xl font-black mt-1"><span id="stock-left-yakisoba">0</span> <span class="text-sm">食</span></div>
+          <div class="mt-2 text-xs text-gray-400 flex items-center space-x-1">
+            <span>初期:</span>
+            <input type="number" id="init-stock-yakisoba" value="50" onchange="updateStockDisplay()" class="w-12 border rounded px-1 text-center font-bold text-gray-700">
+          </div>
+        </div>
+        <!-- 香肠 -->
+        <div id="stock-card-frank" class="p-3 rounded-xl border bg-gray-50 transition">
+          <div class="text-xs font-bold text-gray-500">フランク 残り</div>
+          <div class="text-2xl font-black mt-1"><span id="stock-left-frank">0</span> <span class="text-sm">本</span></div>
+          <div class="mt-2 text-xs text-gray-400 flex items-center space-x-1">
+            <span>初期:</span>
+            <input type="number" id="init-stock-frank" value="50" onchange="updateStockDisplay()" class="w-12 border rounded px-1 text-center font-bold text-gray-700">
+          </div>
+        </div>
+        <!-- 吉事果 -->
+        <div id="stock-card-churros" class="p-3 rounded-xl border bg-gray-50 transition">
+          <div class="text-xs font-bold text-gray-500">チュロス 残り</div>
+          <div class="text-2xl font-black mt-1"><span id="stock-left-churros">0</span> <span class="text-sm">個</span></div>
+          <div class="mt-2 text-xs text-gray-400 flex items-center space-x-1">
+            <span>初期:</span>
+            <input type="number" id="init-stock-churros" value="50" onchange="updateStockDisplay()" class="w-12 border rounded px-1 text-center font-bold text-gray-700">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 订单列表展示区 -->
     <div id="order-list" class="space-y-4">
       <div class="text-center text-gray-400 py-10 font-bold text-lg">データを読み込み中...</div>
     </div>
+
   </div>
 
   <script>
     const GOOGLE_API_URL = "https://script.google.com/macros/s/AKfycbwRx0me0hiXD56P6N_yc0eiZ5C0EQqfdxho6E-1ZM9dZb407HtG2-SgXlPnhZU16I_9GQ/exec";
     let previousPendingCount = 0;
+    let globalSalesCount = { '焼きそば': 0, 'フランクフルト': 0, 'カップチュロス': 0 };
 
-    function playBeep() {
+    function playBeep(freq = 880) {
       try {
         const ctx = new (window.AudioContext || window.webkitAudioContext)();
         const osc = ctx.createOscillator();
         osc.type = "sine";
-        osc.frequency.setValueAtTime(880, ctx.currentTime);
+        osc.frequency.setValueAtTime(freq, ctx.currentTime);
         osc.connect(ctx.destination);
         osc.start();
         osc.stop(ctx.currentTime + 0.2);
@@ -53,6 +115,9 @@
       const container = document.getElementById('order-list');
       
       const groupedOrders = {};
+      let totalSales = 0;
+      let salesCount = { '焼きそば': 0, 'フランクフルト': 0, 'カップチュロス': 0 };
+
       rawList.forEach(item => {
         if (!groupedOrders[item.num]) {
           groupedOrders[item.num] = {
@@ -63,18 +128,46 @@
           };
         }
         groupedOrders[item.num].items.push(item);
+
+        // 统计有效的（未取消的）订单数据
+        if (item.status !== 'canceled') {
+          totalSales += Number(item.price || 0);
+          if (salesCount[item.name] !== undefined) {
+            salesCount[item.name] += 1;
+          }
+        }
       });
 
-      const orderArray = Object.values(groupedOrders);
-      orderArray.sort((a, b) => (a.status === 'done' ? 1 : -1));
+      // 更新营业额与销量 UI
+      document.getElementById('stat-total').innerText = totalSales.toLocaleString();
+      document.getElementById('stat-yakisoba').innerText = salesCount['焼きそば'];
+      document.getElementById('stat-frank').innerText = salesCount['フランクフルト'];
+      document.getElementById('stat-churros').innerText = salesCount['カップチュロス'];
 
-      const pendingOrders = orderArray.filter(o => o.status !== 'done');
-      
+      globalSalesCount = salesCount;
+      updateStockDisplay();
+
+      const orderArray = Object.values(groupedOrders);
+
+      // 排序逻辑：未完成(按单号小到大) -> 已完成(按单号大到小) -> 已取消(置底)
+      orderArray.sort((a, b) => {
+        const getWeight = (status) => status === 'pending' ? 1 : (status === 'done' ? 2 : 3);
+        if (getWeight(a.status) !== getWeight(b.status)) {
+          return getWeight(a.status) - getWeight(b.status);
+        }
+
+        const numA = parseInt((a.num.match(/\d+/) || [0])[0], 10);
+        const numB = parseInt((b.num.match(/\d+/) || [0])[0], 10);
+
+        if (a.status === 'pending') return numA - numB;
+        return numB - numA;
+      });
+
+      const pendingOrders = orderArray.filter(o => o.status === 'pending');
       if (pendingOrders.length > previousPendingCount && previousPendingCount !== 0) {
-        playBeep();
+        playBeep(880); // 新订单提醒音
       }
       previousPendingCount = pendingOrders.length;
-
       document.getElementById('pending-count').innerText = pendingOrders.length;
 
       if (orderArray.length === 0) {
@@ -84,9 +177,21 @@
 
       container.innerHTML = orderArray.map(o => {
         const isDone = o.status === 'done';
-        const cardBg = isDone ? 'bg-gray-200 border-gray-300 opacity-60' : 'bg-white border-amber-400 shadow-md';
-        const badgeBg = isDone ? 'bg-gray-500' : 'bg-amber-500';
-        const statusText = isDone ? '完了済' : '調理中';
+        const isCanceled = o.status === 'canceled';
+
+        let cardBg = 'bg-white border-amber-400 shadow-md';
+        let badgeBg = 'bg-amber-500';
+        let statusText = '調理中';
+
+        if (isDone) {
+          cardBg = 'bg-gray-100 border-gray-300 opacity-70';
+          badgeBg = 'bg-green-600';
+          statusText = '完了済';
+        } else if (isCanceled) {
+          cardBg = 'bg-red-50 border-red-200 opacity-50 line-through';
+          badgeBg = 'bg-red-600';
+          statusText = 'キャンセル';
+        }
 
         const itemListHtml = o.items.map(i => `
           <div class="flex justify-between items-center border-b pb-1 text-lg">
@@ -109,34 +214,71 @@
               ${itemListHtml}
             </div>
 
-            ${!isDone ? `
-              <button onclick="markAsDone('${o.num}')" class="w-full bg-green-500 hover:bg-green-600 active:scale-95 text-white font-bold py-3 rounded-xl text-lg shadow-md transition">
-                ✅ 調理完了（提供済みにする）
-              </button>
-            ` : `
-              <div class="text-center text-sm font-bold text-gray-500 py-1">この注文は提供済みです</div>
-            `}
+            <div class="flex space-x-2">
+              ${!isDone && !isCanceled ? `
+                <button onclick="updateStatus('${o.num}', 'done')" class="w-3/4 bg-green-500 hover:bg-green-600 active:scale-95 text-white font-bold py-3 rounded-xl text-lg shadow-md transition">
+                  ✅ 調理完了
+                </button>
+                <button onclick="updateStatus('${o.num}', 'canceled')" class="w-1/4 bg-red-100 hover:bg-red-200 text-red-600 font-bold py-3 rounded-xl text-sm transition">
+                  ❌ 取消
+                </button>
+              ` : `
+                <div class="w-full text-center text-sm font-bold text-gray-500 py-1">
+                  ${isDone ? 'この注文は提供済みです' : 'この注文はキャンセルされました'}
+                </div>
+              `}
+            </div>
           </div>
         `;
       }).join('');
     }
 
-    async function markAsDone(orderNum) {
-      if (!confirm(`注文 ${orderNum} を「完了」にしますか？`)) return;
+    // 实时计算剩余库存 & 低库存红字预警
+    function updateStockDisplay() {
+      const items = [
+        { id: 'yakisoba', name: '焼きそば' },
+        { id: 'frank', name: 'フランクフルト' },
+        { id: 'churros', name: 'カップチュロス' }
+      ];
+
+      items.forEach(item => {
+        const initVal = Number(document.getElementById(`init-stock-${item.id}`).value || 0);
+        const soldVal = globalSalesCount[item.name] || 0;
+        const leftVal = initVal - soldVal;
+
+        const leftEl = document.getElementById(`stock-left-${item.id}`);
+        const cardEl = document.getElementById(`stock-card-${item.id}`);
+
+        leftEl.innerText = leftVal;
+
+        // 低库存预警逻辑 (<= 5 份时触发红字高亮)
+        if (leftVal <= 5) {
+          cardEl.className = "p-3 rounded-xl border-2 bg-red-50 border-red-400 text-red-700 animate-pulse font-bold";
+        } else {
+          cardEl.className = "p-3 rounded-xl border bg-gray-50 text-gray-800";
+        }
+      });
+    }
+
+    // 更新订单状态（支持 done 或 canceled）
+    async function updateStatus(orderNum, newStatus) {
+      const actionName = newStatus === 'done' ? '完了' : 'キャンセル';
+      if (!confirm(`注文 ${orderNum} を「${actionName}」にしますか？`)) return;
 
       try {
         await fetch(GOOGLE_API_URL, {
           method: 'POST',
           mode: 'no-cors',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action: 'updateStatus', num: orderNum, status: 'done' })
+          body: JSON.stringify({ action: 'updateStatus', num: orderNum, status: newStatus })
         });
         setTimeout(fetchOrders, 500);
       } catch (err) {
-        alert('状态更新失败: ' + err);
+        alert('ステータス更新エラー: ' + err);
       }
     }
 
+    // 每 10 秒自动轮询刷新一次
     setInterval(fetchOrders, 10000);
     fetchOrders();
   </script>
