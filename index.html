@@ -3,11 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ご注文画面</title>
+  <title>ご注文画面 (端末A)</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    body { -webkit-user-select: none; -webkit-touch-callout: none; }
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body class="bg-gray-100 p-4 min-h-screen text-gray-800">
   <div class="max-w-lg mx-auto bg-white p-6 rounded-3xl shadow-lg border border-gray-200">
@@ -18,96 +16,67 @@
     
     <!-- 焼きそば -->
     <div class="bg-amber-50 p-5 rounded-2xl mb-5 border-2 border-amber-200 shadow-sm">
-      <div class="flex justify-between items-center font-bold text-2xl">
-        <span>焼きそば</span>
-        <span class="text-amber-700">500円</span>
-      </div>
+      <div class="flex justify-between items-center font-bold text-2xl"><span>焼きそば</span><span class="text-amber-700">400円</span></div>
       <div class="mt-4 text-lg font-medium flex flex-wrap gap-3">
-        <label class="flex items-center space-x-2 cursor-pointer bg-white px-3 py-2 rounded-xl border border-amber-300">
-          <input type="checkbox" name="yakisoba" value="ウスター" checked class="w-6 h-6 text-indigo-600 rounded">
-          <span>ウスター</span>
-        </label>
-        <label class="flex items-center space-x-2 cursor-pointer bg-white px-3 py-2 rounded-xl border border-amber-300">
-          <input type="checkbox" name="yakisoba" value="ケチャップ" class="w-6 h-6 text-indigo-600 rounded">
-          <span>ケチャップ</span>
-        </label>
-        <label class="flex items-center space-x-2 cursor-pointer bg-white px-3 py-2 rounded-xl border border-amber-300">
-          <input type="checkbox" name="yakisoba" value="マヨネーズ" class="w-6 h-6 text-indigo-600 rounded">
-          <span>マヨネーズ</span>
-        </label>
+        <label class="flex items-center space-x-2 bg-white px-3 py-2 rounded-xl border border-amber-300"><input type="checkbox" name="yakisoba" value="ウスター" checked class="w-6 h-6"><span>ウスター</span></label>
+        <label class="flex items-center space-x-2 bg-white px-3 py-2 rounded-xl border border-amber-300"><input type="checkbox" name="yakisoba" value="ケチャップ" class="w-6 h-6"><span>ケチャップ</span></label>
+        <label class="flex items-center space-x-2 bg-white px-3 py-2 rounded-xl border border-amber-300"><input type="checkbox" name="yakisoba" value="マヨネーズ" class="w-6 h-6"><span>マヨネーズ</span></label>
       </div>
-      <button onclick="addToCart('焼きそば', 500, 'yakisoba')" class="mt-4 w-full bg-amber-500 hover:bg-amber-600 active:scale-95 text-white font-bold py-3 rounded-xl text-lg shadow-md transition">カートに追加</button>
+      <button onclick="addToCart('焼きそば', 400, 'yakisoba')" class="mt-4 w-full bg-amber-500 text-white font-bold py-3 rounded-xl text-lg shadow-md transition">カートに追加</button>
     </div>
 
     <!-- フランクフルト -->
     <div class="bg-rose-50 p-5 rounded-2xl mb-5 border-2 border-rose-200 shadow-sm">
-      <div class="flex justify-between items-center font-bold text-2xl">
-        <span>フランクフルト</span>
-        <span class="text-rose-700">400円</span>
-      </div>
+      <div class="flex justify-between items-center font-bold text-2xl"><span>フランクフルト</span><span class="text-rose-700">400円</span></div>
       <div class="mt-4 text-lg font-medium flex flex-wrap gap-3">
-        <label class="flex items-center space-x-2 cursor-pointer bg-white px-3 py-2 rounded-xl border border-rose-300">
-          <input type="checkbox" name="frank" value="ウスター" class="w-6 h-6 text-indigo-600 rounded">
-          <span>ウスター</span>
-        </label>
-        <label class="flex items-center space-x-2 cursor-pointer bg-white px-3 py-2 rounded-xl border border-rose-300">
-          <input type="checkbox" name="frank" value="ケチャップ" checked class="w-6 h-6 text-indigo-600 rounded">
-          <span>ケチャップ</span>
-        </label>
-        <label class="flex items-center space-x-2 cursor-pointer bg-white px-3 py-2 rounded-xl border border-rose-300">
-          <input type="checkbox" name="frank" value="マヨネーズ" class="w-6 h-6 text-indigo-600 rounded">
-          <span>マヨネーズ</span>
-        </label>
+        <label class="flex items-center space-x-2 bg-white px-3 py-2 rounded-xl border border-rose-300"><input type="checkbox" name="frank" value="ウスター" class="w-6 h-6"><span>ウスター</span></label>
+        <label class="flex items-center space-x-2 bg-white px-3 py-2 rounded-xl border border-rose-300"><input type="checkbox" name="frank" value="ケチャップ" checked class="w-6 h-6"><span>ケチャップ</span></label>
+        <label class="flex items-center space-x-2 bg-white px-3 py-2 rounded-xl border border-rose-300"><input type="checkbox" name="frank" value="マヨネーズ" class="w-6 h-6"><span>マヨネーズ</span></label>
       </div>
-      <button onclick="addToCart('フランクフルト', 400, 'frank')" class="mt-4 w-full bg-rose-500 hover:bg-rose-600 active:scale-95 text-white font-bold py-3 rounded-xl text-lg shadow-md transition">カートに追加</button>
+      <button onclick="addToCart('フランクフルト', 400, 'frank')" class="mt-4 w-full bg-rose-500 text-white font-bold py-3 rounded-xl text-lg shadow-md transition">カートに追加</button>
     </div>
 
     <!-- カップチュロス -->
     <div class="bg-orange-50 p-5 rounded-2xl mb-5 border-2 border-orange-200 shadow-sm">
-      <div class="flex justify-between items-center font-bold text-2xl">
-        <span>カップチュロス</span>
-        <span class="text-orange-700">300円</span>
-      </div>
+      <div class="flex justify-between items-center font-bold text-2xl"><span>カップチュロス</span><span class="text-orange-700">300円</span></div>
       <div class="mt-4 text-lg font-medium flex flex-wrap gap-3">
-        <label class="flex items-center space-x-2 cursor-pointer bg-white px-3 py-2 rounded-xl border border-orange-300">
-          <input type="checkbox" name="churros" value="プレーン" checked class="w-6 h-6 text-indigo-600 rounded">
-          <span>プレーン</span>
-        </label>
-        <label class="flex items-center space-x-2 cursor-pointer bg-white px-3 py-2 rounded-xl border border-orange-300">
-          <input type="checkbox" name="churros" value="チョコ" class="w-6 h-6 text-indigo-600 rounded">
-          <span>チョコ</span>
-        </label>
-        <label class="flex items-center space-x-2 cursor-pointer bg-white px-3 py-2 rounded-xl border border-orange-300">
-          <input type="checkbox" name="churros" value="ジャム" class="w-6 h-6 text-indigo-600 rounded">
-          <span>ジャム</span>
-        </label>
+        <label class="flex items-center space-x-2 bg-white px-3 py-2 rounded-xl border border-orange-300"><input type="checkbox" name="churros" value="プレーン" checked class="w-6 h-6"><span>プレーン</span></label>
+        <label class="flex items-center space-x-2 bg-white px-3 py-2 rounded-xl border border-orange-300"><input type="checkbox" name="churros" value="チョコ" class="w-6 h-6"><span>チョコ</span></label>
+        <label class="flex items-center space-x-2 bg-white px-3 py-2 rounded-xl border border-orange-300"><input type="checkbox" name="churros" value="ジャム" class="w-6 h-6"><span>ジャム</span></label>
       </div>
-      <button onclick="addToCart('カップチュロス', 300, 'churros')" class="mt-4 w-full bg-orange-500 hover:bg-orange-600 active:scale-95 text-white font-bold py-3 rounded-xl text-lg shadow-md transition">カートに追加</button>
+      <button onclick="addToCart('カップチュロス', 300, 'churros')" class="mt-4 w-full bg-orange-500 text-white font-bold py-3 rounded-xl text-lg shadow-md transition">カートに追加</button>
     </div>
 
-    <!-- カートと合計 -->
+    <!-- 结算区 -->
     <div class="border-t-2 pt-5">
       <h2 class="font-bold text-gray-800 text-xl mb-3">選択中の商品：</h2>
       <ul id="cart-list" class="text-base bg-gray-50 p-4 rounded-xl border min-h-[70px] space-y-2 font-medium"></ul>
-      <div class="flex justify-between items-center mt-5 text-2xl font-bold">
+      
+      <!-- 割引適用チェックボックス -->
+      <div class="mt-4 bg-purple-50 p-3 rounded-xl border border-purple-200">
+        <label class="flex items-center space-x-3 cursor-pointer">
+          <input type="checkbox" id="discount-checkbox" class="w-6 h-6 text-purple-600 rounded">
+          <span class="font-bold text-purple-900 text-lg">🎁 割引適用 (この注文にマーク)</span>
+        </label>
+      </div>
+
+      <div class="flex justify-between items-center mt-4 text-2xl font-bold">
         <span>合計金額：</span>
         <span class="text-red-600 text-3xl"><span id="total-price">0</span> 円</span>
       </div>
+      
       <div class="flex space-x-3 mt-5">
-        <button onclick="clearCart()" class="w-1/3 bg-gray-300 hover:bg-gray-400 active:scale-95 text-gray-800 font-bold py-3 rounded-2xl text-lg transition">取消</button>
+        <button onclick="clearCart()" class="w-1/3 bg-gray-300 hover:bg-gray-400 active:scale-95 text-gray-800 font-bold py-3 rounded-2xl text-lg transition">取り消し</button>
         <button id="submit-btn" onclick="submitOrder()" class="w-2/3 bg-green-500 hover:bg-green-600 active:scale-95 text-white font-bold py-3 rounded-2xl text-xl shadow-lg transition">注文確定</button>
       </div>
     </div>
   </div>
 
   <script>
-    const DEVICE_ID = "A"; // 其它手机可改为 B, C 等
-    const SLACK_WEBHOOK_URL = "https://hooks.slack.com/services/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";
-    const GOOGLE_API_URL = "https://script.google.com/macros/s/AKfycbwRx0me0hiXD56P6N_yc0eiZ5C0EQqfdxho6E-1ZM9dZb407HtG2-SgXlPnhZU16I_9GQ/exec";
+    const DEVICE_ID = "A";
+    const GOOGLE_API_URL = "https://script.google.com/macros/s/AKfycbymx0h8nGaF4vgOb35kTQvCBFhjcmXG6gFbPGcNjIC8txVs3Rhe5K1IulB7OJOToo6NrQ/exec";
 
-    document.getElementById('dev-tag').innerText = `端末: ${DEVICE_ID}`;
-
-    let cart = [];
+    let cart = []; 
     let total = 0;
 
     function addToCart(name, price, checkboxName) {
@@ -115,44 +84,50 @@
       const selectedSauces = checkedBoxes.map(cb => cb.value);
       const sauceText = selectedSauces.length > 0 ? selectedSauces.join('・') : 'ソースなし';
 
-      cart.push({ name, price, sauce: sauceText });
-      total += price;
+      cart.push({ name, price, sauce: sauceText }); 
+      total += price; 
       renderCart();
     }
 
-    function clearCart() {
-      cart = [];
-      total = 0;
-      renderCart();
+    function clearCart() { 
+      cart = []; 
+      total = 0; 
+      document.getElementById('discount-checkbox').checked = false;
+      renderCart(); 
     }
 
     function renderCart() {
       const list = document.getElementById('cart-list');
-      if (cart.length === 0) {
-        list.innerHTML = '<span class="text-gray-400 text-lg">選択されていません</span>';
-      } else {
+      if (cart.length === 0) { 
+        list.innerHTML = '<span class="text-gray-400 text-lg">選択されていません</span>'; 
+      } else { 
         list.innerHTML = cart.map((i, idx) => `
           <li class="flex justify-between items-center border-b pb-1">
             <span>・<b>${i.name}</b>（${i.sauce}）</span>
             <span class="font-bold">${i.price}円 <button onclick="removeItem(${idx})" class="text-red-500 font-bold ml-2 text-xl px-1">✕</button></span>
           </li>
-        `).join('');
+        `).join(''); 
       }
       document.getElementById('total-price').innerText = total;
     }
 
-    function removeItem(idx) {
-      total -= cart[idx].price;
-      cart.splice(idx, 1);
-      renderCart();
+    function removeItem(idx) { 
+      total -= cart[idx].price; 
+      cart.splice(idx, 1); 
+      renderCart(); 
     }
 
     async function submitOrder() {
       if (cart.length === 0) return alert('商品を選択してください。');
 
+      const isDiscounted = document.getElementById('discount-checkbox').checked;
       const orderNumStr = `#${DEVICE_ID}-${String(Date.now()).slice(-3)}`;
 
-      if (!confirm(`注文 ${orderNumStr}（合計 ${total}円）を確定しますか？`)) return;
+      let confirmMsg = `注文 ${orderNumStr}（合計 ${total}円`;
+      if (isDiscounted) confirmMsg += ` 【割引適用】`;
+      confirmMsg += `）を確定しますか？`;
+
+      if (!confirm(confirmMsg)) return;
 
       const btn = document.getElementById('submit-btn');
       btn.disabled = true;
@@ -162,28 +137,28 @@
       const now = new Date();
       const timeStr = now.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
-      const newOrder = {
-        id: Date.now(),
-        num: orderNumStr,
-        time: timeStr,
-        items: [...cart],
+      const newOrder = { 
+        id: Date.now(), 
+        num: orderNumStr, 
+        time: timeStr, 
+        items: [...cart], 
         total: total,
+        isDiscounted: isDiscounted,
         status: 'pending'
       };
 
-      const itemDetails = newOrder.items.map(i => `• *${i.name}* \`[${i.sauce}]\``).join('\n');
-      const slackPayload = { text: `🔔 *【注文 ${orderNumStr}】* (${timeStr})\n${itemDetails}\n💰 *合計: ${newOrder.total}円*` };
-
       try {
-        await Promise.all([
-          fetch(SLACK_WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(slackPayload) }),
-          fetch(GOOGLE_API_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(newOrder) })
-        ]);
+        await fetch(GOOGLE_API_URL, { 
+          method: 'POST', 
+          mode: 'no-cors', 
+          headers: { 'Content-Type': 'application/json' }, 
+          body: JSON.stringify(newOrder) 
+        });
       } catch (err) {
         console.error('送信エラー:', err);
       }
 
-      alert(`注文 ${orderNumStr} を受付けました！`);
+      alert(`注文 ${orderNumStr} を受付けました！`); 
       clearCart();
 
       btn.disabled = false;
