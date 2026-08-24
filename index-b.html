@@ -155,12 +155,15 @@
       btn.classList.remove('opacity-50', 'cursor-not-allowed');
     }
     
-    // 清空购物车与重置所有复选框
-    function clearCart() { 
+function clearCart() { 
       cart = []; 
       total = 0; 
-      document.getElementById('discount-checkbox').checked = false;
+      
+      // 把页面上所有的复选框（包括酱料和折扣标记）全部设为不勾选
+      document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+        cb.checked = false;
       });
+
       renderCart();
     }
 
