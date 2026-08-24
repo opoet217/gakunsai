@@ -160,12 +160,6 @@
       cart = []; 
       total = 0; 
       document.getElementById('discount-checkbox').checked = false;
-      document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
-        if (cb.id !== 'discount-checkbox') {
-          cb.checked = (cb.value === "ウスター" && cb.name === "yakisoba") || 
-                       (cb.value === "ケチャップ" && cb.name === "frank") || 
-                       (cb.value === "プレーン" && cb.name === "churros");
-        }
       });
       renderCart();
     }
