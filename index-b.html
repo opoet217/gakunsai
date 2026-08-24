@@ -82,8 +82,8 @@
    function addToCart(name, price, checkboxName, btnId) {
       const btn = document.getElementById(btnId);
       
-      if (btn.dataset.locked === "true") return;
-      btn.dataset.locked = "true";
+      if (btn.disabled) return;
+      btn.disabled = true;
 
       const checkedBoxes = Array.from(document.querySelectorAll(`input[name="${checkboxName}"]:checked`));
       const selectedSauces = checkedBoxes.map(cb => cb.value);
@@ -100,7 +100,7 @@
       setTimeout(() => {
         btn.className = originalBg;
         btn.innerText = "カートに追加";
-        btn.dataset.locked = "false";
+        btn.disabled = false;
       }, 800);
     }
 
