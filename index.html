@@ -109,7 +109,12 @@
       if (cart.length === 0) return alert('商品を選択してください。');
 
       const isDiscounted = document.getElementById('discount-checkbox').checked;
-      const orderNumStr = `#${DEVICE_ID}-${String(Date.now()).slice(-3)}`;
+      let counterKey = `order_counter_${DEVICE_ID}`;
+      let currentSeq = parseInt(localStorage.getItem(counterKey) || "0") + 1;
+      if (currentSeq > 999) currentSeq = 1; 
+      localStorage.setItem(counterKey, currentSeq);
+
+      const orderNumStr = `#${DEVICE_ID}-${currentSeq}`;
 
       let confirmMsg = `注文 ${orderNumStr}（合計 ${total}円`;
       if (isDiscounted) confirmMsg += ` 【割引適用】`;
