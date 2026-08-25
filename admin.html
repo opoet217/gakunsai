@@ -95,7 +95,6 @@
     const PAGE_SIZE = 10;
     let cachedOrderArray = [];
 
-    // 商品固定显示顺序优先级定义
     const ITEM_PRIORITY = {
       "焼きそば": 1,
       "フランクフルト": 2,
@@ -155,14 +154,14 @@
 
       const orderArray = Object.values(groupedOrders);
 
-      // 💡 源头强制排序：每一单内部的所有单品严格按【炒面 ➔ 香肠 ➔ 吉事果】排列
+      // 源头排序：单品严格按【炒面 ➔ 香肠 ➔ 吉事果】
       orderArray.forEach(o => {
         o.items.sort((a, b) => {
           return (ITEM_PRIORITY[a.name] || 99) - (ITEM_PRIORITY[b.name] || 99);
         });
       });
 
-      // 订单间的状态与单号排序
+      // 订单排序
       orderArray.sort((a, b) => {
         const getWeight = (status) => status === 'pending' ? 1 : (status === 'done' ? 2 : 3);
         if (getWeight(a.status) !== getWeight(b.status)) {
@@ -253,9 +252,9 @@
                   ❌ 取消
                 </button>
               ` : `
-                <div class="w-full text-center text-sm font-bold text-gray-500 py-1">
-                  ${isDone ? 'この注文は提供済みです' : 'この注文はキャンセルされました'}
-                </div>
+                <button onclick="updateStatus(event, '${o.num}', 'pending')" class="w-full bg-gray-200 hover:bg-gray-300 active:scale-95 text-gray-700 font-bold py-2 rounded-xl text-xs transition">
+                  ↩️ 未完了に戻す（押し間違え時）
+                </button>
               `}
             </div>
           </div>
@@ -301,11 +300,8 @@
       });
     }
 
-    // 💡 1秒缓冲乐观更新：点击立刻禁用按钮防重复触发，1秒后重新渲染卡片与顶部计数
+    // 💡 零弹窗极速更新：点击按钮直接出餐，1秒后平滑变灰，支持误触一键撤回
     async function updateStatus(event, orderNum, newStatus) {
-      const actionName = newStatus === 'done' ? '完了' : 'キャンセル';
-      if (!confirm(`注文 ${orderNum} を「${actionName}」にしますか？`)) return;
-
       const btnContainer = event.currentTarget.parentElement;
       if (btnContainer) {
         const buttons = btnContainer.querySelectorAll('button');
