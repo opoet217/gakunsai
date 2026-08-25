@@ -95,6 +95,13 @@
     const PAGE_SIZE = 10;
     let cachedOrderArray = [];
 
+    // 💡 商品の固定表示順序优先级定义
+    const ITEM_PRIORITY = {
+      "焼きそば": 1,
+      "フランクフルト": 2,
+      "カップチュロス": 3
+    };
+
     function playBeep(freq = 880) {
       try {
         const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -208,7 +215,12 @@
           statusText = 'キャンセル';
         }
 
-        const itemListHtml = o.items.map(i => `
+        // 💡 对订单内商品严格按【炒面 ➔ 香肠 ➔ 吉事果】排序
+        const sortedItems = [...o.items].sort((a, b) => {
+          return (ITEM_PRIORITY[a.name] || 99) - (ITEM_PRIORITY[b.name] || 99);
+        });
+
+        const itemListHtml = sortedItems.map(i => `
           <div class="flex justify-between items-center border-b pb-1 text-lg">
             <span class="font-bold text-gray-800">・${i.name}</span>
             <span class="text-sm font-semibold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md border border-indigo-200">${i.sauce}</span>
@@ -231,10 +243,10 @@
 
             <div class="flex space-x-2">
               ${!isDone && !isCanceled ? `
-                <button onclick="updateStatus('${o.num}', 'done')" class="w-3/4 bg-green-500 hover:bg-green-600 active:scale-95 text-white font-bold py-3 rounded-xl text-lg shadow-md transition">
+                <button onclick="updateStatus(event, '${o.num}', 'done')" class="w-3/4 bg-green-500 hover:bg-green-600 active:scale-95 text-white font-bold py-3 rounded-xl text-lg shadow-md transition">
                   ✅ 調理完了
                 </button>
-                <button onclick="updateStatus('${o.num}', 'canceled')" class="w-1/4 bg-red-100 hover:bg-red-200 text-red-600 font-bold py-3 rounded-xl text-sm transition">
+                <button onclick="updateStatus(event, '${o.num}', 'canceled')" class="w-1/4 bg-red-100 hover:bg-red-200 text-red-600 font-bold py-3 rounded-xl text-sm transition">
                   ❌ 取消
                 </button>
               ` : `
@@ -286,31 +298,48 @@
       });
     }
 
-    // 💡 乐观更新：点完立刻改变前端卡片状态，不等网络，彻底消除卡顿感！
-    async function updateStatus(orderNum, newStatus) {
+    // 💡 1 秒缓冲乐观更新：点击立刻禁用按钮防猛点，延迟 1 秒卡片变灰，避免轮询闪烁
+    async function updateStatus(event, orderNum, newStatus) {
       const actionName = newStatus === 'done' ? '完了' : 'キャンセル';
       if (!confirm(`注文 ${orderNum} を「${actionName}」にしますか？`)) return;
 
-      const targetOrder = cachedOrderArray.find(o => o.num === orderNum);
-      if (targetOrder) {
-        targetOrder.status = newStatus;
-        renderCurrentPage();
+      // 1. 立即禁用所在卡片上的所有按钮，防止连点
+      const btnContainer = event.currentTarget.parentElement;
+      if (btnContainer) {
+        const buttons = btnContainer.querySelectorAll('button');
+        buttons.forEach(b => {
+          b.disabled = true;
+          b.classList.add('opacity-50', 'cursor-not-allowed');
+        });
       }
 
+      // 2. 发送异步请求
+      const fetchPromise = fetch(GOOGLE_API_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'updateStatus', num: orderNum, status: newStatus })
+      });
+
+      // 3. 延迟 1 秒更新界面，预留后台写入时间，完美避开轮询覆盖
+      setTimeout(() => {
+        const targetOrder = cachedOrderArray.find(o => o.num === orderNum);
+        if (targetOrder) {
+          targetOrder.status = newStatus;
+          renderCurrentPage();
+        }
+      }, 1000);
+
+      // 4. 异常捕获与回滚
       try {
-        await fetch(GOOGLE_API_URL, {
-          method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action: 'updateStatus', num: orderNum, status: newStatus })
-        });
+        await fetchPromise;
       } catch (err) {
-        alert('ステータス更新エラー: ' + err);
+        alert('ステータス更新エラー（通信失敗）: ' + err);
         fetchOrders();
       }
     }
 
-    setInterval(fetchOrders, 8000); // 8秒轮询，既不卡系统也能及时更新
+    setInterval(fetchOrders, 8000); // 8秒轮询
     fetchOrders();
   </script>
 </body>
