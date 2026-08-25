@@ -115,7 +115,9 @@
 
     async function fetchOrders() {
       try {
-        const res = await fetch(GOOGLE_API_URL);
+        // 💡 加上随机时间戳，规避 HTTP 缓存延迟
+        const timestampUrl = `${GOOGLE_API_URL}?t=${new Date().getTime()}`;
+        const res = await fetch(timestampUrl);
         const data = await res.json();
         processOrders(data);
       } catch (err) {
