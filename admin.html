@@ -95,7 +95,7 @@
     const PAGE_SIZE = 10;
     let cachedOrderArray = [];
 
-    // 💡 商品の固定表示順序优先级定义
+    // 商品固定显示顺序优先级定义
     const ITEM_PRIORITY = {
       "焼きそば": 1,
       "フランクフルト": 2,
@@ -155,6 +155,14 @@
 
       const orderArray = Object.values(groupedOrders);
 
+      // 💡 源头强制排序：每一单内部的所有单品严格按【炒面 ➔ 香肠 ➔ 吉事果】排列
+      orderArray.forEach(o => {
+        o.items.sort((a, b) => {
+          return (ITEM_PRIORITY[a.name] || 99) - (ITEM_PRIORITY[b.name] || 99);
+        });
+      });
+
+      // 订单间的状态与单号排序
       orderArray.sort((a, b) => {
         const getWeight = (status) => status === 'pending' ? 1 : (status === 'done' ? 2 : 3);
         if (getWeight(a.status) !== getWeight(b.status)) {
@@ -215,12 +223,7 @@
           statusText = 'キャンセル';
         }
 
-        // 💡 对订单内商品严格按【炒面 ➔ 香肠 ➔ 吉事果】排序
-        const sortedItems = [...o.items].sort((a, b) => {
-          return (ITEM_PRIORITY[a.name] || 99) - (ITEM_PRIORITY[b.name] || 99);
-        });
-
-        const itemListHtml = sortedItems.map(i => `
+        const itemListHtml = o.items.map(i => `
           <div class="flex justify-between items-center border-b pb-1 text-lg">
             <span class="font-bold text-gray-800">・${i.name}</span>
             <span class="text-sm font-semibold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md border border-indigo-200">${i.sauce}</span>
@@ -298,12 +301,11 @@
       });
     }
 
-    // 💡 1 秒缓冲乐观更新：点击立刻禁用按钮防猛点，延迟 1 秒卡片变灰，避免轮询闪烁
+    // 💡 1秒缓冲乐观更新：点击立刻禁用按钮防重复触发，1秒后重新渲染卡片与顶部计数
     async function updateStatus(event, orderNum, newStatus) {
       const actionName = newStatus === 'done' ? '完了' : 'キャンセル';
       if (!confirm(`注文 ${orderNum} を「${actionName}」にしますか？`)) return;
 
-      // 1. 立即禁用所在卡片上的所有按钮，防止连点
       const btnContainer = event.currentTarget.parentElement;
       if (btnContainer) {
         const buttons = btnContainer.querySelectorAll('button');
@@ -313,7 +315,6 @@
         });
       }
 
-      // 2. 发送异步请求
       const fetchPromise = fetch(GOOGLE_API_URL, {
         method: 'POST',
         mode: 'no-cors',
@@ -321,16 +322,19 @@
         body: JSON.stringify({ action: 'updateStatus', num: orderNum, status: newStatus })
       });
 
-      // 3. 延迟 1 秒更新界面，预留后台写入时间，完美避开轮询覆盖
       setTimeout(() => {
         const targetOrder = cachedOrderArray.find(o => o.num === orderNum);
         if (targetOrder) {
           targetOrder.status = newStatus;
+          
+          const pendingOrders = cachedOrderArray.filter(o => o.status === 'pending');
+          previousPendingCount = pendingOrders.length;
+          document.getElementById('pending-count').innerText = pendingOrders.length;
+
           renderCurrentPage();
         }
       }, 1000);
 
-      // 4. 异常捕获与回滚
       try {
         await fetchPromise;
       } catch (err) {
@@ -339,7 +343,7 @@
       }
     }
 
-    setInterval(fetchOrders, 8000); // 8秒轮询
+    setInterval(fetchOrders, 8000);
     fetchOrders();
   </script>
 </body>
